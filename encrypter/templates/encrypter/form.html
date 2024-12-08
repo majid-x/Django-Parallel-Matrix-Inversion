@@ -1,0 +1,217 @@
+{% load custom_filters %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Encryption and Decryption</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: black;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        .form-container {
+            background-color: rgba(64, 69, 69, 0.586); 
+            padding: 30px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border: rgb(157, 123, 191) solid 2px;
+        }
+
+        h1, h2, h3 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            color: #fff;
+            font-size: 1.1em;
+        }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 5px;
+            text-align: center;
+        }
+
+        input[type="text"] {
+            width: 60px;
+            text-align: center;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1em;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .result-container {
+            margin-top: 20px;
+        }
+
+        .result-container h2, .result-container h3 {
+            text-align: center;
+        }
+
+        .result-container pre {
+            background-color: #333;
+            padding: 15px;
+            color: #fff;
+            font-size: 1.1em;
+            border-radius: 5px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1>Matrix Encryption and Decryption</h1>
+
+            {% if error_message %}
+                <p class="error">{{ error_message }}</p>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                <label for="operation">Choose Operation:</label><br>
+                <select name="operation" id="operation" required>
+                    <option value="" disabled {% if not operation %}selected{% endif %}>-- Select --</option>
+                    <option value="encrypt" {% if operation == "encrypt" %}selected{% endif %}>Encryption</option>
+                    <option value="decrypt" {% if operation == "decrypt" %}selected{% endif %}>Decryption</option>
+                </select><br><br>
+
+                {% if operation == "encrypt" %}
+                    <label for="message">Enter the message to encrypt:</label><br>
+                    <input type="text" name="message" id="message" required style="width: 100%;"><br><br>
+
+                    <label for="size">Enter matrix size:</label><br>
+                    <input type="number" name="size" id="size" value="{{ size }}" required><br><br>
+
+                    {% if size %}
+                    <h3>Enter the {{ size }}x{{ size }} matrix:</h3>
+                    <table>
+                        {% for i in size|range_filter %}
+                        <tr>
+                            {% for j in size|range_filter %}
+                            <td>
+                                <input type="text" name="matrix_{{ i }}_{{ j }}" required>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {% endif %}
+
+                {% elif operation == "decrypt" %}
+                    <label for="message">Enter the encrypted message:</label><br>
+                    <input type="text" name="message" id="message" required style="width: 100%;"><br><br>
+
+                    <label for="size">Enter matrix size:</label><br>
+                    <input type="number" name="size" id="size" value="{{ size }}" required><br><br>
+
+                    <label for="decompose_method">Decryption Method:</label><br>
+                    <select name="decompose_method" id="decompose_method" required>
+                        <option value="Gaussian" {% if method == "Gaussian" %}selected{% endif %}>Gaussian Inversion</option>
+                        <option value="LU" {% if method == "LU" %}selected{% endif %}>LU Decomposition</option>
+                    </select><br><br>
+
+                    <label for="inversion_mode">Processing Mode:</label><br>
+                    <select name="inversion_mode" id="inversion_mode" required>
+                        <option value="Sequential" {% if processing == "Sequential" %}selected{% endif %}>Sequential</option>
+                        <option value="Parallel" {% if processing == "Parallel" %}selected{% endif %}>Parallel</option>
+                    </select><br><br>
+
+                    {% if size %}
+                    <h3>Enter the {{ size }}x{{ size }} matrix (used for encryption):</h3>
+                    <table>
+                        {% for i in size|range_filter %}
+                        <tr>
+                            {% for j in size|range_filter %}
+                            <td>
+                                <input type="text" name="matrix_{{ i }}_{{ j }}" required>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {% endif %}
+                {% endif %}
+
+                <button type="submit">Submit</button>
+            </form>
+
+            {% if encrypted_message %}
+                <div class="result-container">
+                    <h2>Encrypted Message:</h2>
+                    <p>{{ encrypted_message }}</p>
+                </div>
+            {% endif %}
+
+            {% if decrypted_message %}
+                <div class="result-container">
+                    <h2>Decrypted Message:</h2>
+                    <p>{{ decrypted_message }}</p>
+                </div>
+            {% endif %}
+
+            {% if matrix_inverse %}
+                <div class="result-container">
+                    <h2>Inverse Matrix:</h2>
+                    <pre>
+                        {% for row in matrix_inverse %}
+                            {{ row|join:" " }}
+                        {% endfor %}
+                    </pre>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
