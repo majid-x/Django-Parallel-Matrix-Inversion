@@ -5,36 +5,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP&display=swap" rel="stylesheet">
+
     <title>Message Encryption and Decryption</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: black;
+        font-size: medium;
+       font-weight: 200;
+        margin: 0;
+        scroll-behavior: smooth;
+        font-family: "Poppins",sans-serif;
+        padding: 0;
+        position: relative;
+        
+             }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
             background-size: cover;
-            margin: 0;
-            padding: 0;
+            background-repeat: no-repeat;
+            filter: blur(1px); 
+            z-index: -1; 
         }
+
+        h1{
+            text-align: center;
+            color: white;
+            font-size: 40px;
+            margin-top: 50px;
+            font-size: 3rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        h1:hover{
+
+            transform: scale(1.1);
+        }
+        h1 span{
+            color: rgb(255, 255, 255);
+            text-shadow: 0 0 25px #f867d4;
+        }
+        
+
+        .text-animation{
+            font-size: 35px;
+            font-weight: 600;
+            min-width: 280px;
+        }
+        .text-animation span{
+            position: relative;
+
+        }
+        .text-animation span::before{
+            content: "Decompositions";
+            color: #a53589;
+            animation: words 20s infinite;
+
+        }
+        .text-animation span::after {
+            content: "";
+            background-color: rgb(37, 37, 37);  
+            position: absolute;
+            width: calc(100% + 8px);
+            height: 100%;
+            border-left: 3px solid #461d3b;
+            right: -8px;
+            animation: cursor 0.6s infinite, typing 20s steps(14) infinite;
+        }
+        @keyframes cursor{
+            to{
+                border-left: 2px solid #00ffee;
+            }
+        }
+        @keyframes words{
+            0%,
+            20%{
+                content: "LU Decomposition";
+            }
+            21%,
+            40%{
+                content:"Guassian Inversion";
+            }
+            41%,
+            60%{
+                content:"Sequential Processing";
+            }
+            61%,
+            80%{
+                content: "Parallel Processing";
+
+            }
+            81%,
+            100%{
+                content: "Decompositions";
+            }
+        }
+        @keyframes typing{
+            10%,
+            15%,
+            30%,
+            35%,
+            50%,
+            55%,
+            70%,
+            75%,
+            90%,
+            95%{
+                width:0;
+            }
+            5%,
+            20%,
+            25%,
+            40%,
+            45%,
+            60%,
+            65%,
+            80%,
+            85%{
+                width:calc(100%  +  8px)
+            }
+
+
+        }
+        
 
         .container {
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 20px;
             color: white;
+           
         }
+        
 
         .form-container {
-            background-color: rgba(64, 69, 69, 0.586); 
+            background-color: rgba(92, 57, 83, 0.586); 
             padding: 30px;
             border-radius: 10px;
             width: 100%;
             max-width: 600px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 45px #a53589;
             border: rgb(157, 123, 191) solid 2px;
+            margin: 5%;
+            
         }
 
-        h1, h2, h3 {
+        h2, h3 {
             color: #fff;
             text-align: center;
             margin-bottom: 20px;
@@ -44,12 +167,20 @@
             color: #fff;
             font-size: 1.1em;
         }
+        select{
+            color: gray;
+            cursor: pointer;
+        }
+        option{
+            color: #a53589;
+        }
+       
 
         input[type="text"], input[type="number"], select {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
-            border: 1px solid #ddd;
+            border: 1px solid #a53589;
             border-radius: 4px;
             font-size: 1em;
             box-sizing: border-box;
@@ -58,6 +189,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            box-shadow: #a53589;
         }
 
         td {
@@ -67,11 +199,11 @@
 
         input[type="text"] {
             width: 60px;
-            text-align: center;
+            text-align: left;
         }
 
         button {
-            background-color: #007bff;
+            background-color: #a53589;
             color: white;
             border: none;
             border-radius: 4px;
@@ -79,10 +211,17 @@
             cursor: pointer;
             width: 100%;
             font-size: 1.1em;
+            cursor: pointer;
+            transition: 0.3s ease;
+            margin-left: auto;
+            box-shadow: 0 0 25px #461d3b;
+    
+           
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: #a53589;
+            transform: scale(1.1);
         }
 
         .error {
@@ -96,24 +235,26 @@
         }
 
         .result-container h2, .result-container h3 {
-            text-align: center;
+            text-align: left;
         }
 
         .result-container pre {
-            background-color: #333;
+            background-color: #461d3b;
             padding: 15px;
             color: #fff;
             font-size: 1.1em;
             border-radius: 5px;
             overflow: auto;
+            
         }
     </style>
 </head>
 <body>
+    <h1>Message Encryption and <span> Decryption </span></h1>
+    <h3 class="text-animation">Using <span></span></h3>
     <div class="container">
+         
         <div class="form-container">
-            <h1>Message Encryption and Decryption</h1>
-
             {% if error_message %}
                 <p class="error">{{ error_message }}</p>
             {% endif %}
@@ -122,7 +263,7 @@
                 {% csrf_token %}
                 <label for="operation">Choose Operation:</label><br>
                 <select name="operation" id="operation" required>
-                    <option value="" disabled {% if not operation %}selected{% endif %}>-- Select --</option>
+                    <option value="" disabled {% if not operation %}selected{% endif %}>Select </option>
                     <option value="encrypt" {% if operation == "encrypt" %}selected{% endif %}>Encryption</option>
                     <option value="decrypt" {% if operation == "decrypt" %}selected{% endif %}>Decryption</option>
                 </select><br><br>
@@ -158,6 +299,7 @@
 
                     <label for="decompose_method">Decryption Method:</label><br>
                     <select name="decompose_method" id="decompose_method" required>
+                        
                         <option value="Gaussian" {% if method == "Gaussian" %}selected{% endif %}>Gaussian Inversion</option>
                         <option value="LU" {% if method == "LU" %}selected{% endif %}>LU Decomposition</option>
                     </select><br><br>
