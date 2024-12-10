@@ -126,7 +126,7 @@ def matrix_view(request):
     matrix_inverse = None
     decompose_method = None
     inversion_mode = None
-
+    message = request.POST.get("message", "").split()
     if request.method == 'POST':
         try:
    
@@ -136,7 +136,7 @@ def matrix_view(request):
             size = int(request.POST.get("size", 0))
 
   
-            if size <= 0:
+            if size <= 0 and message:
                 raise ValueError("Matrix size must be greater than zero.")
 
 
@@ -147,7 +147,7 @@ def matrix_view(request):
 
             if operation == "encrypt":
                 message = request.POST.get("message", "")
-                if not message:
+                if not message and size:
                     raise ValueError("Message cannot be empty for encryption.")
                 if operation == "encrypt":
                     encrypted_message = encrypt_message(message, matrix)
@@ -160,7 +160,7 @@ def matrix_view(request):
                     L, U = lu_decomposition(matrix)
                     matrix_inverse = inverse_using_lu(L, U, size, parallel=(inversion_mode == "Parallel"))
 
-                encrypted_values = list(map(int, request.POST.get("message", "").split()))
+                encrypted_values = list(map(int, message))
                 decrypted_message = decrypt_message(encrypted_values, matrix_inverse, size)
             
 

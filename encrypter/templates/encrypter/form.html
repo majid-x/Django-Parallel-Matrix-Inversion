@@ -269,13 +269,12 @@
                 </select><br><br>
 
                 {% if operation == "encrypt" %}
-                    <label for="message">Enter the message to encrypt:</label><br>
-                    <input type="text" name="message" id="message" required style="width: 100%;"><br><br>
-
                     <label for="size">Enter matrix size:</label><br>
                     <input type="number" name="size" id="size" value="{{ size }}" required><br><br>
 
                     {% if size %}
+                    <label for="message">Enter the message to encrypt:</label><br>
+                    <input type="text" name="message" id="message" required style="width: 100%;"><br><br>
                     <h3>Enter the {{ size }}x{{ size }} matrix:</h3>
                     <table>
                         {% for i in size|range_filter %}
@@ -291,12 +290,16 @@
                     {% endif %}
 
                 {% elif operation == "decrypt" %}
-                    <label for="message">Enter the encrypted message:</label><br>
-                    <input type="text" name="message" id="message" required style="width: 100%;"><br><br>
+                    
 
                     <label for="size">Enter matrix size:</label><br>
                     <input type="number" name="size" id="size" value="{{ size }}" required><br><br>
 
+
+
+                    {% if size %}
+                    <label for="message">Enter the encrypted message:</label><br>
+                    <input type="text" name="message" id="message" required style="width: 100%;"><br><br>
                     <label for="decompose_method">Decryption Method:</label><br>
                     <select name="decompose_method" id="decompose_method" required>
                         
@@ -309,8 +312,6 @@
                         <option value="Sequential" {% if processing == "Sequential" %}selected{% endif %}>Sequential</option>
                         <option value="Parallel" {% if processing == "Parallel" %}selected{% endif %}>Parallel</option>
                     </select><br><br>
-
-                    {% if size %}
                     <h3>Enter the {{ size }}x{{ size }} matrix (used for encryption):</h3>
                     <table>
                         {% for i in size|range_filter %}
