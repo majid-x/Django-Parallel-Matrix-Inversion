@@ -115,7 +115,10 @@ def encrypt_message(message, matrix):
     msg_numbers = text_to_numbers(padded_msg)
     msg_matrix = [msg_numbers[i:i+size] for i in range(0, len(msg_numbers), size)]
     encrypted_matrix = matrix_multiply(msg_matrix, matrix)
-    return [int(value) for row in encrypted_matrix for value in row]
+    # Return the encrypted message as a space-separated string
+    encrypted_values = [int(value) for row in encrypted_matrix for value in row]
+    return ' '.join(map(str, encrypted_values))
+
 def matrix_view(request):
     size = None
     matrix = []
