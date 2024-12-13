@@ -61,14 +61,30 @@ def lu_decomposition(matrix):
 def inverse_using_lu(L, U, size, parallel=False):
     def forward_substitution(L, b):
         y = [0] * size
-        for i in range(size):
+        
+        def compute_y(i):
             y[i] = b[i] - sum(L[i][j] * y[j] for j in range(i))
+
+        if parallel:
+            with ThreadPoolExecutor() as executor:
+                executor.map(compute_y, range(size))
+        else:
+            for i in range(size):
+                compute_y(i)
         return y
 
     def backward_substitution(U, y):
         x = [0] * size
-        for i in range(size - 1, -1, -1):
+
+        def compute_x(i):
             x[i] = (y[i] - sum(U[i][j] * x[j] for j in range(i + 1, size))) / U[i][i]
+
+        if parallel:
+            with ThreadPoolExecutor() as executor:
+                executor.map(compute_x, range(size - 1, -1, -1))
+        else:
+            for i in range(size - 1, -1, -1):
+                compute_x(i)
         return x
 
     inverse = []
@@ -115,7 +131,6 @@ def encrypt_message(message, matrix):
     msg_numbers = text_to_numbers(padded_msg)
     msg_matrix = [msg_numbers[i:i+size] for i in range(0, len(msg_numbers), size)]
     encrypted_matrix = matrix_multiply(msg_matrix, matrix)
-    # Return the encrypted message as a space-separated string
     encrypted_values = [int(value) for row in encrypted_matrix for value in row]
     return ' '.join(map(str, encrypted_values))
 
